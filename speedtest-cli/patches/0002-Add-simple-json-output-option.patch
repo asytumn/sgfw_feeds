@@ -1,0 +1,48 @@
+--- a/speedtest.py
++++ b/speedtest.py
+@@ -1735,6 +1735,9 @@
+     parser.add_argument('--simple', action='store_true', default=False,
+                         help='Suppress verbose output, only show basic '
+                              'information')
++    parser.add_argument('--simple-json', action='store_true', default=False, dest='simple_json',
++                        help='Suppress verbose output, only show basic '
++                             'information in json format')
+     parser.add_argument('--csv', action='store_true', default=False,
+                         help='Suppress verbose output, only show basic '
+                              'information in CSV format. Speeds listed in '
+@@ -1855,12 +1858,12 @@
+     if debug:
+         DEBUG = True
+ 
+-    if args.simple or args.csv or args.json:
++    if args.simple or args.simple_json or args.csv or args.json:
+         quiet = True
+     else:
+         quiet = False
+ 
+-    if args.csv or args.json:
++    if args.csv or args.json or args.simple_json:
+         machine_format = True
+     else:
+         machine_format = False
+@@ -1966,7 +1969,7 @@
+ 
+     printer('Results:\n%r' % results.dict(), debug=True)
+ 
+-    if not args.simple and args.share:
++    if not args.simple and not args.simple_json and args.share:
+         results.share()
+ 
+     if args.simple:
+@@ -1980,6 +1983,11 @@
+         printer(results.csv(delimiter=args.csv_delimiter))
+     elif args.json:
+         printer(results.json())
++    elif args.simple_json:
++        printer('{\"ping\":%d,\"download\":%d,\"upload\":%d}' %
++                (int(results.ping),
++                 int(results.download / 1000),
++                 int(results.upload / 1000)))
+ 
+     if args.share and not machine_format:
+         printer('Share results: %s' % results.share())
